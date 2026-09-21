@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store';
 import { mockApi } from '../api';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
 
 const CreateCase: React.FC = () => {
   const { addCase } = useStore();
@@ -24,7 +23,7 @@ const CreateCase: React.FC = () => {
   const validatePan = (pan: string) => {
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (pan && !panRegex.test(pan.toUpperCase())) {
-      setPanError('Invalid PAN format (e.g., ABCDE1234F)');
+      setPanError('Invalid PAN format. Please enter PAN in format: ABCDE1234F');
       return false;
     }
     setPanError('');
@@ -47,7 +46,7 @@ const CreateCase: React.FC = () => {
     }
 
     if (!formData.consentGiven) {
-      setError('You must obtain customer consent before verification.');
+      setError('Customer consent is required.');
       return;
     }
 
@@ -64,50 +63,77 @@ const CreateCase: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <Link to="/" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
-          <ArrowLeft size={20} />
-        </Link>
-        <h2 style={{ margin: 0 }}>Create PAN Verification</h2>
+    <div className="animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+      
+      <div style={{ marginBottom: '2rem' }}>
+        <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Fill in the details to create a new verification request</p>
       </div>
 
-      <div className="card glass-panel">
+      <div className="card">
+        <h3 className="card-title" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+          Case Information
+        </h3>
+
         {error && (
-          <div style={{ background: '#fee2e2', color: '#b91c1c', padding: '0.75rem', borderRadius: '8px', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+          <div style={{ background: 'var(--danger-bg)', color: 'var(--danger-color)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
             <AlertCircle size={16} /> {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label className="input-label">Applicant/Customer Name *</label>
-            <input 
-              type="text" 
-              className="input-field" 
-              value={formData.applicantName}
-              onChange={e => setFormData({...formData, applicantName: e.target.value})}
-              required
-              placeholder="e.g. John Doe"
-            />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="input-group">
-              <label className="input-label">Mobile Number *</label>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Applicant / Customer Name <span>*</span></label>
               <input 
-                type="tel" 
+                type="text" 
                 className="input-field" 
-                value={formData.mobileNumber}
-                onChange={e => setFormData({...formData, mobileNumber: e.target.value})}
+                value={formData.applicantName}
+                onChange={e => setFormData({...formData, applicantName: e.target.value})}
                 required
-                pattern="[0-9]{10}"
-                placeholder="10-digit number"
+                placeholder="Enter full name"
               />
             </div>
+          </div>
 
-            <div className="input-group">
-              <label className="input-label">PAN Number *</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Mobile Number <span>*</span></label>
+              <div style={{ display: 'flex' }}>
+                <span style={{ padding: '0.75rem 1rem', background: 'var(--bg-app)', border: '1px solid var(--border-color)', borderRight: 'none', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)', color: 'var(--text-secondary)', fontWeight: 500 }}>+91</span>
+                <input 
+                  type="tel" 
+                  className="input-field" 
+                  style={{ borderRadius: '0 var(--radius-md) var(--radius-md) 0' }}
+                  value={formData.mobileNumber}
+                  onChange={e => setFormData({...formData, mobileNumber: e.target.value})}
+                  required
+                  pattern="[0-9]{10}"
+                  placeholder="9876543210"
+                />
+              </div>
+            </div>
+
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">Purpose of Verification <span>*</span></label>
+              <select 
+                className="input-field"
+                value={formData.purpose}
+                onChange={e => setFormData({...formData, purpose: e.target.value})}
+                required
+              >
+                <option value="">Select purpose...</option>
+                <option value="Loan Verification">Loan Verification</option>
+                <option value="Credit Card Processing">Credit Card Processing</option>
+                <option value="Bank Account Opening">Bank Account Opening</option>
+                <option value="General KYC Update">General KYC Update</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="input-group" style={{ marginBottom: 0 }}>
+              <label className="input-label">PAN Number <span>*</span></label>
               <input 
                 type="text" 
                 className={`input-field ${panError ? 'error' : ''}`} 
@@ -117,44 +143,28 @@ const CreateCase: React.FC = () => {
                 maxLength={10}
                 placeholder="ABCDE1234F"
               />
-              {panError && <span className="error-text">{panError}</span>}
+              {panError && <span className="error-text" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><AlertCircle size={14} /> {panError}</span>}
+              {!panError && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.25rem' }}>PAN format: ABCDE1234F</span>}
             </div>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Purpose of Verification *</label>
-            <select 
-              className="input-field"
-              value={formData.purpose}
-              onChange={e => setFormData({...formData, purpose: e.target.value})}
-              required
-            >
-              <option value="">Select purpose...</option>
-              <option value="Loan Application">Loan Application</option>
-              <option value="Credit Card">Credit Card Processing</option>
-              <option value="Bank Account">Bank Account Opening</option>
-              <option value="KYC Update">General KYC Update</option>
-            </select>
-          </div>
-
-          <div className="input-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginTop: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+          <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2.5rem' }}>
             <input 
               type="checkbox" 
               id="consent"
               checked={formData.consentGiven}
               onChange={e => setFormData({...formData, consentGiven: e.target.checked})}
-              style={{ marginTop: '0.25rem', width: '1.2rem', height: '1.2rem', accentColor: 'var(--primary-color)' }}
+              style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--primary-color)', cursor: 'pointer' }}
             />
-            <label htmlFor="consent" style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', cursor: 'pointer', lineHeight: 1.5 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Customer Consent Declaration</strong><br/>
-              I confirm that I have obtained explicit consent from the applicant to verify their PAN details against NSDL/Income Tax Department records for the specified purpose.
+            <label htmlFor="consent" style={{ fontSize: '0.875rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
+              I confirm that customer consent has been obtained for PAN verification.
             </label>
           </div>
 
-          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-            <Link to="/" className="btn btn-secondary">Cancel</Link>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={loading || !!panError}>
-              {loading ? 'Verifying...' : 'Submit Case'}
+              {loading ? 'Verifying PAN...' : 'Submit for Verification'}
             </button>
           </div>
         </form>

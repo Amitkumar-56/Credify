@@ -1,84 +1,104 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
-import { mockApi } from '../api';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, AlertCircle } from 'lucide-react';
+import { useStore } from '../store';
+import { ShieldCheck, AlertCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('demo@credify.in');
   const [password, setPassword] = useState('demo123');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useStore();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setIsLoading(true);
+
     try {
-      const result = await mockApi.login(email, password);
-      login(result.name);
+      login(email);
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', width: '100%', padding: '1rem' }}>
-      <div className="card glass-panel animate-fade-in" style={{ maxWidth: '400px', width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{ color: 'var(--primary-color)', fontSize: '1.5rem', fontWeight: 700 }}>Credify India</h2>
-          <p style={{ color: 'var(--text-secondary)' }}>Sign in to CRM Dashboard</p>
-        </div>
-        
-        {error && (
-          <div style={{ background: '#fee2e2', color: '#b91c1c', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-            <AlertCircle size={16} /> {error}
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+      {/* Left Side Branding */}
+      <div style={{ flex: 1, background: 'linear-gradient(135deg, var(--primary-deep) 0%, var(--primary-color) 100%)', display: 'flex', flexDirection: 'column', padding: '4rem', color: 'white', justifyContent: 'center' }} className="login-branding">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '4rem' }}>
+          <ShieldCheck size={48} color="#ffffff" />
+          <div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 700, margin: 0, color: 'white' }}>CREDIFY INDIA</h1>
+            <span style={{ fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.8 }}>Verification CRM</span>
           </div>
-        )}
+        </div>
+        <h2 style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1.2, marginBottom: '1.5rem', color: 'white' }}>
+          Smarter Verification<br />for a Safer Tomorrow
+        </h2>
+        <p style={{ fontSize: '1.125rem', opacity: 0.8 }}>Secure • Reliable • Trusted</p>
+        
+        <div style={{ marginTop: 'auto', fontSize: '0.875rem', opacity: 0.6 }}>
+          © 2026 Credify India. All rights reserved.
+        </div>
+      </div>
 
-        <form onSubmit={handleLogin}>
-          <div className="input-group">
-            <label className="input-label">Email</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+      {/* Right Side Login Form */}
+      <div style={{ flex: 1, background: 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <div style={{ width: '100%', maxWidth: '400px' }}>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>Welcome Back</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>Sign in to your Credify India account</p>
+
+          {error && (
+            <div style={{ background: 'var(--danger-bg)', color: 'var(--danger-color)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+              <AlertCircle size={16} /> {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+            <div className="input-group">
+              <label className="input-label">Email Address</label>
               <input 
                 type="email" 
                 className="input-field" 
-                style={{ paddingLeft: '2.5rem' }}
-                value={email} 
-                onChange={e => setEmail(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
+                placeholder="admin@credify.demo"
               />
             </div>
-          </div>
-          
-          <div className="input-group">
-            <label className="input-label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+            
+            <div className="input-group">
+              <label className="input-label">Password</label>
               <input 
                 type="password" 
-                className="input-field"
-                style={{ paddingLeft: '2.5rem' }} 
-                value={password} 
-                onChange={e => setPassword(e.target.value)}
+                className="input-field" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
+                placeholder="Enter your password"
               />
             </div>
-          </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} disabled={loading}>
-            {loading ? 'Signing in...' : 'Login'}
-          </button>
-        </form>
-        
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-          Demo credentials: <strong>demo@credify.in</strong> / <strong>demo123</strong>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
+              <input type="checkbox" id="remember" style={{ accentColor: 'var(--primary-color)' }} />
+              <label htmlFor="remember" style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Remember me</label>
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.875rem' }} disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Login'}
+            </button>
+          </form>
+
+          <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--bg-app)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem' }}>
+            <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Demo Credentials:</p>
+            <p style={{ margin: 0 }}>Email: <strong>demo@credify.in</strong></p>
+            <p style={{ margin: 0 }}>Password: <strong>demo123</strong></p>
+          </div>
         </div>
       </div>
     </div>

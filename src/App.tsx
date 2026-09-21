@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStore } from './store';
-import { Menu } from 'lucide-react';
 
 import Sidebar from './components/Sidebar';
+import TopHeader from './components/TopHeader';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import CreateCase from './pages/CreateCase';
@@ -21,19 +21,29 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Main Layout Component
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  // Determine title based on route
+  const getTitle = () => {
+    switch (location.pathname) {
+      case '/': return 'Dashboard';
+      case '/create-case': return 'Create PAN Verification Case';
+      case '/cases': return 'Verification Cases';
+      default: return 'Dashboard';
+    }
+  };
 
   return (
-    <div className="app-container">
+    <div className="app-layout">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <div className="mobile-header">
-        <button className="menu-toggle" onClick={() => setIsSidebarOpen(true)}>
-          <Menu size={24} />
-        </button>
-        <h1 style={{ color: 'var(--primary-color)', fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Credify</h1>
+      <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+      
+      <div className="main-wrapper">
+        <TopHeader onMenuClick={() => setIsSidebarOpen(true)} title={getTitle()} />
+        <main className="main-content">
+          {children}
+        </main>
       </div>
-      <main className="main-content">
-        {children}
-      </main>
     </div>
   );
 };
