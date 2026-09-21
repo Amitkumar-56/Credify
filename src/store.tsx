@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import type { PanVerificationCase } from './types';
 
 interface AuthState {
@@ -17,7 +17,7 @@ interface StoreContextType extends AuthState, CaseState {}
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<{ name: string } | null>(null);
   
